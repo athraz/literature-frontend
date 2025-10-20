@@ -9,17 +9,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        
-      - name: Build Docker Image
-        run: docker build -t literature-frontend .
-  
-      - name: Save Docker Image
-        run: docker save literature-frontend | gzip > literature-frontend.tar.gz
-  
+
+      - name: Install Podman on Runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Build Podman Image
+        run: podman build -t literature-frontend .
+
+      - name: Save Podman Image
+        run: podman save literature-frontend | gzip > literature-frontend.tar.gz
+
       - name: Upload Image Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -45,9 +50,9 @@ jobs:
           port: ${{ secrets.VM_PORT }}
           key: ${{ secrets.VM_SSH_KEY }}
           source: "literature-frontend.tar.gz"
-          target: "/home/athrazan2004/"
+          target: "/home/${{ secrets.VM_USERNAME }}/"
 
-      - name: Deploy on VM
+      - name: Deploy on VM using Podman
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VM_HOST }}
@@ -55,7 +60,7 @@ jobs:
           port: ${{ secrets.VM_PORT }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            docker load < /home/ubuntu/literature-frontend.tar.gz
-            docker stop literature-frontend || true
-            docker rm literature-frontend || true
-            docker run -d -p 3100:3000 --name literature-frontend literature-frontend
+            podman load < /home/${{ secrets.VM_USERNAME }}/literature-frontend.tar.gz
+            podman stop literature-frontend || true
+            podman rm literature-frontend || true
+            podman run -d -p 3100:3000 --name literature-frontend literature-frontend
