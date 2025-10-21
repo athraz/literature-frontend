@@ -22,15 +22,15 @@ jobs:
       - name: Build Podman Image
         run: podman build -t literature-frontend .
 
+      - name: Save Podman Image
+        run: podman save literature-frontend | gzip > literature-frontend.tar.gz
+
       - name: Scan Image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'literature-frontend'
+          input: 'literature-frontend.tar.gz'
           format: 'table'
           exit-code: '1'
-
-      - name: Save Podman Image
-        run: podman save literature-frontend | gzip > literature-frontend.tar.gz
 
       - name: Upload Image Artifact
         uses: actions/upload-artifact@v4
