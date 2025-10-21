@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:14-alpine
 
 WORKDIR apps
 
@@ -12,4 +12,4 @@ RUN npm install -g pm2 serve
 
 EXPOSE 3000
 
-CMD ["pm2-runtime", "serve", "-s", "build", "-l", "3000"]
+CMD ["pm2", "start", "serve", "--name", "frontend", "-s", "build", "-l", "3000", "--no-daemon"]
