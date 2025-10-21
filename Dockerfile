@@ -6,8 +6,10 @@ COPY . .
 
 RUN npm install
 
-RUN npm install pm2 -g
+RUN npm run build
+
+RUN npm install -g pm2 serve
 
 EXPOSE 3000
 
-CMD ["pm2-runtime", "ecosystem.config.js"]
+CMD ["pm2-runtime", "serve", "-s", "build", "-l", "3000"]
