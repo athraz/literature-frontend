@@ -30,6 +30,7 @@ jobs:
         with:
           input: 'literature-frontend.tar.gz'
           format: 'table'
+          severity: 'HIGH,CRITICAL'
           exit-code: '1'
 
       - name: Upload Image Artifact
